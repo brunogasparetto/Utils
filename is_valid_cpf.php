@@ -37,7 +37,7 @@ function is_valid_cpf($cpf)
 	}
 	
 	$remainder = $sum % 11;
-	$digit = $remainder < 2 ? 0 : 11 - $rest;
+	$digit = $remainder < 2 ? 0 : 11 - $remainder;
 	
 	return $digit == $cpf[10];
 }

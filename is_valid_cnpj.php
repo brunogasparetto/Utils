@@ -18,7 +18,7 @@ function is_valid_cnpj(string $cnpj): bool
 	
 	$sum = 0;
 	
-	for ( $i = 1; $i < 13; ++$i ) {
+	for ($i = 1; $i < 13; ++$i) {
 		$sum += $weights[$i] * charValue($cnpj[$i - 1]);
 	}
 	

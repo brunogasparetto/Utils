@@ -1,44 +1,50 @@
 <?php
 
 /**
- * Check if CNJP (Cadastro Nacional de Pessoa Jurídica) is valid
+ * Check if CNJP (Cadastro Nacional de Pessoa Jurídica) is valid.
+ *
+ * @param string $cnpj The CNPJ number. The letters must be upper case to be valid.
+ * @return bool
  */
-function is_valid_cnpj(string $cnpj): bool
+function is_valid_cnpj($cnpj)
 {
-	$cnpj = mb_convert_encoding(mb_strtoupper($cnpj), 'ASCII');
+	// Only numbers
+	$cnpj = mb_convert_encoding($cnpj, 'ASCII');
 
-	// Only valid characters
 	$cnpj = preg_replace('/[^A-Z0-9]/', '', $cnpj);
-	
-	if (strlen($cnpj) != 14 OR preg_match('/(.)\1{13}/', $cnpj)) {
+
+	if (strlen($cnpj) != 14
+		OR preg_match('/(.)\1{13}/', $cnpj)
+		OR !preg_match('/^([A-Z\d]){12}(\d){2}$/', $cnpj)
+	) {
 		return false;
 	}
-	
-	$weights = array(6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2);
-	
+
+	$weights = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
 	$sum = 0;
-	
-	for ($i = 1; $i < 13; ++$i) {
+
+	for ( $i = 1; $i < 13; ++$i ) {
 		$sum += $weights[$i] * charValue($cnpj[$i - 1]);
 	}
-	
+
 	$remainder = $sum % 11;
-	$digit = $remainder < 2 ? 0 : 11 - $remainder;
-	
-	if (charValue($cnpj[12]) !== $digit) {
+	$digit = $remainder < 2 ? 0 : (11 - $remainder);
+
+	if ($cnpj[12] != $digit) {
 		return false;
 	}
 
 	$sum = 0;
-	
-	for ($i = 0; $i < 13; ++$i) {
+
+	for ( $i = 0; $i < 13; ++$i ) {
 		$sum += $weights[$i] * charValue($cnpj[$i]);
 	}
-	
+
 	$remainder = $sum % 11;
-	$digit = ($remainder) < 2 ? 0 : 11 - $remainder;
-	
-	return charValue($cnpj[13]) === $digit;
+	$digit = $remainder < 2 ? 0 : (11 - $remainder);
+
+	return $cnpj[13] == $digit;
 }
 
 /**
